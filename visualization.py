@@ -7,6 +7,14 @@ import matplotlib
 
 matplotlib.use("Agg")
 
+# デプロイ先(Linux/コンテナ/Streamlit Cloud等)では日本語フォントが入っていないことが多く、
+# その場合に図の日本語が豆腐/空白になります。
+# japanize-matplotlib は日本語フォント設定を自動化できるため、存在すれば優先して適用します。
+try:
+    import japanize_matplotlib  # noqa: F401
+except Exception:
+    japanize_matplotlib = None  # type: ignore[assignment]
+
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 import numpy as np
@@ -18,14 +26,27 @@ import capability_engine
 
 sns.set_theme()
 
-# 日本語ラベルが豆腐/空白になる環境があるため、Windowsで一般的な日本語フォントを優先指定
+# 日本語ラベルが豆腐/空白になる環境があるため、日本語フォント候補を広めに指定
+# (OSごとに利用可能なフォントが異なる)
 matplotlib.rcParams["font.family"] = "sans-serif"
 matplotlib.rcParams["font.sans-serif"] = [
+    # Windows
     "Yu Gothic",
     "Meiryo",
     "MS Gothic",
     "MS PGothic",
     "Arial Unicode MS",
+    # macOS
+    "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN",
+    # Linux (よく入っている/入れやすい)
+    "Noto Sans CJK JP",
+    "Noto Sans JP",
+    "IPAPGothic",
+    "IPAexGothic",
+    "TakaoGothic",
+    "VL Gothic",
+    # 最後の砦
     "DejaVu Sans",
 ]
 matplotlib.rcParams["axes.unicode_minus"] = False
